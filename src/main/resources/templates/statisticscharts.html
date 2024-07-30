@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Insulin Pump Dashboard</title>
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+    <style>
+	* {
+  box-sizing: border-box;
+  outline: none;
+}
+
+:root {
+  --bg-color: #f5f8ff;;
+  --main-color: #353536;
+  --secondary-color: #8e92a4;
+  --main-text-color: #5d606b;
+  --secondary-dark-color: #9496a5;
+  --tag-color-one: #e0fbf6;
+  --tag-color-text-one: #58c2a9;
+  --tag-color-two: #ece7fe;
+  --tag-color-update: #04bd07;
+  --tag-color-medium: #e06004;
+  --tag-color-critical: #ba0d0d;
+  --tag-color-text-two: #8972f3;
+  --tag-color-three: #fde7ea;
+  --tag-color-text-three: #e77f89;
+  --tag-color-four: #f7f8fc;
+  --tag-color-text-four: #fcfcfc;
+  --tag-color-buttonrow: #4682B4;
+  --checkbox-color: #009e90;
+  --button-color: #49beb7;
+  --box-color: #fff1d6;
+  --box-color-2: #d3e6ff;
+  --box-color-3: #ffd9d9;
+  --box-color-4: #daffe5;
+  --task-color: #777982;
+}
+
+%flex {
+  display: flex;
+  align-items: center;
+}
+
+body {
+  margin: 20px 0;
+  @extend %flex;
+  justify-content: center;
+  flex-direction: column;
+  overflow: auto;
+  font-family: 'DM Sans', sans-serif;;
+  font-size: 12px;
+}
+
+.task-manager {
+  display: flex;
+  justify-content: space-evenly;
+  background: #fff;
+  margin: auto;
+  width:90%;
+  height: 90%;
+  border-radius: 4px;
+  box-shadow:
+  0 0.3px 2.2px rgba(0, 0, 0, 0.011),
+  0 0.7px 5.3px rgba(0, 0, 0, 0.016),
+  0 1.3px 10px rgba(0, 0, 0, 0.02),
+  0 2.2px 17.9px rgba(0, 0, 0, 0.024),
+  0 4.2px 33.4px rgba(0, 0, 0, 0.029),
+  0 10px 80px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+}
+
+.right-bar {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.header {
+    display: flex;
+    font-size: 15px;
+    color: var(--main-text-color);
+    margin-left: 30px;
+    margin-bottom: 10px;
+    align-self: start;
+    align-items: center;
+    flex-direction: row;
+    justify-content: space-evenly;
+    width: 90%;
+}
+.title{
+    display: flex;
+    font-size: 25px;
+    color: var(--main-text-color);
+    margin-left: 30px;
+    margin-top: 20px;
+    align-self: start;
+    flex-direction: row;
+}
+
+.subtitle{
+    display: flex;
+    font-size: 16px;
+    margin-left: 30px;
+    align-self: start;
+    flex-direction: row;
+}
+
+.right-content {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Divide la parte destra in due colonne */
+  gap: 20px;
+  padding: 20px;/* Aggiunge uno spazio tra le colonne */
+}
+
+.button:hover {
+  background-color: var(--button-color); /* Cambia il colore al passaggio del mouse */
+}
+
+.button {
+  background-color: #4CAF50; /* Green */
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  border-radius: 100px;
+  margin-top: 25px;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+.task-box {
+  width: 100%; /* Imposta la larghezza del contenitore grafico al 100% */
+  margin-bottom: 20px;
+}
+
+.task-box-date {
+  width: 50%; /* Imposta la larghezza del contenitore grafico al 100% */
+}
+
+
+.yellow { background-color: var(--box-color); }
+
+.blue { background-color: var(--box-color-2); }
+
+.red { background-color: var(--box-color-3); }
+
+.green { background-color: var(--box-color-4); }
+
+</style>
+</head>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<body>
+<link href="https://fonts.googleapis.com/css?family=DM+Sans:400,500,700&display=swap" rel="stylesheet">
+<div class="task-manager">
+    <div class="right-bar">
+        <div class="title">Charts by Date Intervals</div>
+        <p class="subtitle">Leave the dates empty if you want all the registered measurements</p>
+        <div class="header">
+            <div class="task-box-date">
+                <label for="start">Start date:</label>
+                <input id="start" placeholder="yyyy-mm-dd" name="trip-start"/>
+            </div>
+            <div class="task-box-date">
+                <label for="end">End date:</label>
+                <input id="end" placeholder="yyyy-mm-dd" name="trip-end"/>
+            </div>
+            <div>
+                <button class="button" onclick="checkDate()">Show Charts</button>
+            </div>
+            <div>
+                <button class="button" onclick="clearCharts()">Clear Charts</button>
+            </div>
+            <div>
+                <a class="button" href="/">Back home</a>
+            </div>
+        </div>
+        <div class="right-content">
+            <div class="task-box yellow">
+                <div id="chart1"></div>
+            </div>
+            <div class="task-box blue">
+                <div id="chart2"></div>
+            </div>
+            <div class="task-box red">
+                <div id="chart3"></div>
+            </div>
+            <div class="task-box green">
+                <div id="chart4"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    var heartrate_timeseries = [];
+    var sistpressure_timeseries = [];
+    var diastpressure_timeseries = [];
+    var bloodsugar_timeseries = [];
+    var temperature_timeseries = [];
+
+    var options1 = {
+            chart: {
+                type: 'line',
+                zoom: {
+                    enabled: true
+                },
+                toolbar: {
+                    show: true
+                }
+            },
+            series: [{
+                name: 'heartrate',
+                data: heartrate_timeseries
+            }],
+            xaxis: {
+                labels: {
+                    show: false,
+                }
+            },
+            yaxis:{
+                title: {
+                    text: "bpm"
+                }
+            },
+            title: {
+                text: 'HeartRate Timeseries',
+                align: 'center'
+            },
+            stroke: {
+                curve: 'smooth'
+            }
+        }
+        var options2 = {
+            chart: {
+                type: 'line',
+
+                zoom: {
+                    enabled: true
+                },
+                toolbar: {
+                    show: true
+                }
+            },
+            series: [{
+                    name: 'Sistolic pressure',
+                    data: sistpressure_timeseries
+                },
+                {
+                    name: 'Diastolic pressure',
+                    data: diastpressure_timeseries
+                }
+            ],
+            xaxis: {
+                labels: {
+                    show: false,
+                }
+            },
+            yaxis:{
+                title: {
+                    text: "mmHg"
+                }
+            },
+            title: {
+                text: 'Pressure Timeseries',
+                align: 'center'
+            },
+            stroke: {
+                curve: 'smooth'
+            }
+        }
+        var options3 = {
+            chart: {
+                type: 'line',
+                zoom: {
+                    enabled: true
+                },
+                toolbar: {
+                    show: true
+                }
+            },
+            series: [{
+                name: 'bloodsugar',
+                data: bloodsugar_timeseries
+            }],
+            xaxis: {
+                labels: {
+                    show: false,
+                }
+            },
+            yaxis:{
+                title: {
+                    text: "mg/dL"
+                }
+            },
+            title: {
+                text: 'Blood Sugar Timeseries',
+                align: 'center'
+            },
+            stroke: {
+                curve: 'smooth'
+            },
+        }
+        var options4 = {
+            chart: {
+                type: 'line',
+                zoom: {
+                    enabled: true
+                },
+                toolbar: {
+                    show: true
+                }
+            },
+            series: [{
+                name: 'temperature',
+                data: temperature_timeseries
+            }],
+            xaxis: {
+                labels: {
+                    show: false,
+                },
+            },
+            yaxis:{
+                title: {
+                    text: "C°"
+                }
+            },
+            title: {
+                text: 'Temperature Timeseries',
+                align: 'center'
+            },
+            stroke: {
+                curve: 'smooth'
+            },
+        }
+
+    var chart1 = new ApexCharts(document.querySelector("#chart1"), options1);
+    var chart2 = new ApexCharts(document.querySelector("#chart2"), options2);
+    var chart3 = new ApexCharts(document.querySelector("#chart3"), options3);
+    var chart4 = new ApexCharts(document.querySelector("#chart4"), options4);
+
+    chart1.render();
+    chart2.render();
+    chart3.render();
+    chart4.render();
+
+
+    function isValidDate(dateString) {
+        return !isNaN(Date.parse(dateString));
+    }
+
+    function checkDate(){
+        var start_date_check = document.getElementById("start").value + "T00:00:00.000000";
+        var end_date_check = document.getElementById("end").value + "T23:59:59.999999";
+        if(start_date_check === "T00:00:00.000000" && end_date_check === "T23:59:59.999999"){
+            showCharts();
+        }
+        else{
+            if(isValidDate(document.getElementById("start").value) && isValidDate(document.getElementById("end").value)){
+                document.getElementById("start").value = document.getElementById("start").value.replace(/-(\d)\b/g, '-0$1');
+                document.getElementById("end").value = document.getElementById("end").value.replace(/-(\d)\b/g, '-0$1');
+                showCharts();
+            }
+            else{
+                document.getElementById("start").value = '';
+                document.getElementById("end").value = '';
+                alert("invalid date format!");
+            }
+        }
+    }
+
+    function showCharts(){
+        var start_date = document.getElementById("start").value + "T00:00:00.000000";
+        var end_date = document.getElementById("end").value + "T23:59:59.999999";
+        var url = "";
+        const Http = new XMLHttpRequest();
+        const jsonData = {
+            "startDate": start_date,
+            "endDate": end_date
+        };
+
+        if(start_date === "T00:00:00.000000" && end_date === "T23:59:59.999999"){
+            url = 'http://localhost:8080/vitalparameters/';
+            Http.open("GET", url);
+            Http.send();
+        }
+        else{
+            url = 'http://localhost:8080/vitalparameters/date';
+            Http.open("POST", url);
+            Http.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            Http.send(JSON.stringify(jsonData));
+        }
+
+        Http.onreadystatechange = (e) => {
+            if (Http.readyState === 4 && Http.status === 200) {
+                const obj = JSON.parse(Http.responseText);
+                heartrate_timeseries = [];
+                sistpressure_timeseries = [];
+                diastpressure_timeseries = [];
+                bloodsugar_timeseries = [];
+                temperature_timeseries = [];
+                obj.forEach(item => {
+                    heartrate_timeseries.push(item.heartRate);
+                    sistpressure_timeseries.push(item.bloodPressureSystolic);
+                    diastpressure_timeseries.push(item.bloodPressureDiastolic);
+                    bloodsugar_timeseries.push(item.bloodSugarLevel);
+                    temperature_timeseries.push(item.temperature.toFixed(1));
+                });
+
+                if(start_date === "T00:00:00.000000"){
+                    document.getElementById("start").value = obj[0].timestamp.split("T")[0].replace(/-(\d)\b/g, '-0$1');
+                    document.getElementById("end").value = obj[obj.length - 1].timestamp.split("T")[0].replace(/-(\d)\b/g, '-0$1');
+                }
+
+                // Aggiorna il grafico con i nuovi dati
+				chart1.updateSeries([{
+					data: heartrate_timeseries
+				}]);
+				// Aggiorna il grafico con i nuovi dati
+				chart2.updateSeries([{
+					data: sistpressure_timeseries
+				}, {
+					data: diastpressure_timeseries
+				}]);
+				// Aggiorna il grafico con i nuovi dati
+				chart3.updateSeries([{
+					data: bloodsugar_timeseries
+				}]);
+				// Aggiorna il grafico con i nuovi dati
+				chart4.updateSeries([{
+					data: temperature_timeseries
+				}]);
+
+            }
+            else if (Http.readyState === 4 && Http.status === 400)
+                alert("invalid date format!");
+        }
+	}
+
+	function clearCharts(){
+	    // Aggiorna il grafico con i nuovi dati
+        chart1.updateSeries([{
+            data: []
+        }]);
+        // Aggiorna il grafico con i nuovi dati
+        chart2.updateSeries([{
+            data: []
+        }, {
+            data: []
+        }]);
+        // Aggiorna il grafico con i nuovi dati
+        chart3.updateSeries([{
+            data: []
+        }]);
+        // Aggiorna il grafico con i nuovi dati
+        chart4.updateSeries([{
+            data: []
+        }]);
+	}
+</script>
+</body>
+</html>

@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Insulin Pump Dashboard</title>
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+    <style>
+	* {
+  box-sizing: border-box;
+  outline: none;
+}
+
+:root {
+  --bg-color: #f5f8ff;;
+  --main-color: #353536;
+  --secondary-color: #8e92a4;
+  --main-text-color: #5d606b;
+  --secondary-dark-color: #9496a5;
+  --tag-color-one: #e0fbf6;
+  --tag-color-text-one: #58c2a9;
+  --tag-color-two: #ece7fe;
+  --tag-color-update: #04bd07;
+  --tag-color-medium: #e06004;
+  --tag-color-critical: #ba0d0d;
+  --tag-color-text-two: #8972f3;
+  --tag-color-three: #fde7ea;
+  --tag-color-text-three: #e77f89;
+  --tag-color-four: #f7f8fc;
+  --tag-color-text-four: #fcfcfc;
+  --tag-color-buttonrow: #4682B4;
+  --checkbox-color: #009e90;
+  --button-color: #49beb7;
+  --box-color: #fff1d6;
+  --box-color-2: #d3e6ff;
+  --box-color-3: #ffd9d9;
+  --box-color-4: #daffe5;
+  --task-color: #777982;
+}
+
+%flex {
+  display: flex;
+  align-items: center;
+}
+
+body {
+  margin: 20px 0;
+  @extend %flex;
+  justify-content: center;
+  flex-direction: column;
+  overflow: auto;
+  font-family: 'DM Sans', sans-serif;;
+  font-size: 12px;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+button { 
+  border: none; 
+  background: none;
+  cursor: pointer;
+}
+
+.task-manager {
+  display: flex;
+  justify-content: space-evenly;
+  background: #fff;
+  margin: auto;
+  width:90%;
+  height: 90%;
+  border-radius: 4px;
+  box-shadow:
+  0 0.3px 2.2px rgba(0, 0, 0, 0.011),
+  0 0.7px 5.3px rgba(0, 0, 0, 0.016),
+  0 1.3px 10px rgba(0, 0, 0, 0.02),
+  0 2.2px 17.9px rgba(0, 0, 0, 0.024),
+  0 4.2px 33.4px rgba(0, 0, 0, 0.029),
+  0 10px 80px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+}
+
+.left-bar {
+  background-color: var(--bg-color);
+  width: 230px;
+  border-right: 1px solid #e3e7f7;
+  position: relative;
+}
+
+.left-content { padding: 40px; }
+
+.item {
+  @extend %flex;
+  color: var(--main-color);
+  margin-bottom: 14px;
+  font-weight: 500;
+  
+  svg {
+    width: 14px;
+    height: 14px;
+    color: currentcolor;
+    margin-right: 10px;
+  }
+}
+
+.category-list{
+  margin-top: 50px;
+  
+  .item{ color: var(--secondary-color); }
+} 
+
+.actions {
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.circle {
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  background-color: #fe4d46;
+  box-shadow: 14px 0 0 0 #fbc023, 28px 0 0 0 #7dd21f;
+}
+
+.circle-2 {
+  border-radius: 50%;
+  width: 4px;
+  height: 4px;
+  background-color: #d5d7e3;
+  box-shadow: -6px 0 0 0 #d5d7e3, 6px 0 0 0 #d5d7e3;
+}
+
+.right-bar {
+  width: 320px;
+  border-left: 1px solid #e3e7f7;
+  display: flex;
+  flex-direction: column;
+  width: 65%;
+  
+  .header { 
+    font-size: 20px; 
+    color: var(--main-text-color);
+    margin-left: 30px;
+    margin-top: 30px;
+  }
+}
+
+.top-part {
+  padding: 30px;
+  @extend %flex; 
+  align-self: flex-end;
+  
+  svg {
+    width: 14px;
+    height: 14px;
+    color: var(--main-color);
+    margin-right: 14px;
+  }
+  
+  .count {
+    font-size: 12px;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    background-color: #623ce8;
+    color: #fff;
+    @extend %flex;
+    justify-content: center;
+  }
+}
+
+.right-content {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Divide la parte destra in due colonne */
+  gap: 20px;
+  padding: 20px;/* Aggiunge uno spazio tra le colonne */
+}
+
+.task-box {
+  width: 100%; /* Imposta la larghezza del contenitore grafico al 100% */
+  margin-bottom: 20px;
+}
+
+.time { margin-bottom: 6px; opacity: 0.4; font-size: 10px; }
+
+.task-name { 
+  font-size: 14px; 
+  font-weight: 500;
+  opacity: 0.6;
+}
+
+.yellow { 
+  background-color: var(--box-color);
+}
+
+.blue { background-color: var(--box-color-2); }
+
+.red { background-color: var(--box-color-3); }
+
+.green { background-color: var(--box-color-4); }
+
+.more-button {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background-color: #8e92a4;
+  box-shadow: 0 -4px 0 0 #8e92a4, 0 4px 0 0 #8e92a4;
+  opacity: 0.4;
+  right: 20px;
+  top: 30px;
+  cursor: pointer;
+}
+
+.members {
+  display: flex;
+  margin-top: 14px;
+  
+  img {
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    margin-right: 4px;
+    object-fit: cover;
+  }
+}
+
+.page-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 40px 10px 0 20px;
+  width: 35%;
+  
+  .header { 
+    font-size: 26px; 
+    color: var(--main-color); 
+    margin-top: 30px;
+  }
+}
+
+.content-categories {
+  display: flex;
+  justify-content: space-evenly;
+  width: 100%;
+  border-bottom: 1px solid #ddd;
+  padding: 20px 0;
+}
+
+.nav-item { display: none; }
+
+.category { 
+  font-weight: 500; 
+  color: var(--secondary-color); 
+  border-bottom: 1px solid #ddd;
+  transition: .4s ease-in;
+  padding: 20px 30px;
+  cursor: pointer;
+}
+
+#opt-1:checked + label ,
+#opt-2:checked +  label ,
+#opt-3:checked +  label ,
+#opt-4:checked +  label {
+  color: var(--checkbox-color);
+  border-bottom: 2px solid var(--checkbox-color);
+}
+
+.task-item { display: none; }
+
+.tasks-wrapper {
+  padding: 30px 0;
+  flex: 1;
+  overflow-y: auto;
+  height: 100%;
+  padding-right: 8px;
+}
+
+.task {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  margin-bottom: 16px;
+  padding-left: 30px;
+  color: var(--task-color);
+  font-size: 13px;
+  font-weight: 500;
+  
+  &:hover {
+    transform: translatex(2px);
+  }
+  
+  label {
+    cursor: pointer;
+  }
+}
+
+ label .label-text { position: relative; }
+
+ label .label-text:before {
+  content:'';
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 1px solid #ddd;
+  border-radius: 2px;
+  left: -24px;
+  transition: .2s ease;
+}
+
+.task-item:checked + label .label-text:before {
+  background-color: var(--checkbox-color);
+  border: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='feather feather-check'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 10px;
+  background-position: center;
+  border: 1px solid var(--checkbox-color);
+}
+
+.tag {
+  font-size: 10px;
+  padding: 4px 8px;
+  border-radius: 20px;
+  
+  &.approved {
+    background-color: var(--tag-color-one);
+    color: var(--tag-color-text-one);
+  }
+  
+  &.progress {
+    background-color: var(--tag-color-update);
+    color: var(--tag-color-text-two);
+  }
+  
+  &.review {
+    background-color: var(--tag-color-three);
+    color: var(--tag-color-text-three);
+  }
+  
+  &.waiting {
+    background-color: var(--tag-color-critical);
+    color: var(--tag-color-text-four);
+  }
+}
+
+.tagregular{
+    font-size: 10px;
+    padding: 4px 8px;
+    border-radius: 20px;
+    background-color: var(--tag-color-update);
+    color: var(--tag-color-text-four);
+}
+
+.tagmedium{
+    font-size: 10px;
+    padding: 4px 8px;
+    border-radius: 20px;
+    background-color: var(--tag-color-medium);
+    color: var(--tag-color-text-four);
+}
+
+.tagcritical{
+    font-size: 10px;
+    padding: 4px 8px;
+    border-radius: 20px;
+    background-color: var(--tag-color-critical);
+    color: var(--tag-color-text-four);
+}
+
+
+.upcoming { 
+  border-bottom: 1px solid #ddd; 
+  padding-bottom: 30px;
+  margin-bottom: 30px;
+}
+
+@media screen and (max-width: 900px) {
+  .left-bar {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 700px) {
+  .task-manager {
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  
+  .right-bar, .page-content {
+    width: 100%;
+    display: block;
+  }
+  
+  .tasks-wrapper { height: auto; }
+}
+
+@media screen and (max-width: 520px) {
+  .page-content { padding: 40px 10px 0 10px; }
+  
+  .right-content { padding: 10px 16px; }
+  
+  .category { padding: 20px; }
+}
+
+.buttons-row {
+  display: flex;
+  justify-content: space-evenly;
+  margin-top: 50px;
+}
+
+.button:hover {
+  background-color: var(--button-color); /* Cambia il colore al passaggio del mouse */
+}
+
+.button {
+  background-color: #4CAF50; /* Green */
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 12px;
+  border-radius: 100px;
+  margin-top: 25px;
+  margin-left: 15px;
+  margin-right: 15px;
+}
+
+.wrapper {
+  /* This part is important for centering the content */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wrapper a {
+  display: inline-block;
+  text-decoration: none;
+  padding: 15px;
+  background-color: #fff;
+  border-radius: 3px;
+  text-transform: uppercase;
+  color: #585858;
+  font-family: 'Roboto', sans-serif;
+}
+
+.modal {
+  z-index: 99;
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(77, 77, 77, .7);
+  transition: all .4s;
+}
+
+.modal:target {
+  visibility: visible;
+  opacity: 100;
+}
+
+.modal__content {
+  border-radius: 4px;
+  position: relative;
+  width: 500px;
+  max-width: 90%;
+  background: #fff;
+  padding: 1em 2em;
+}
+
+.modal__footer {
+  text-align: right;
+  a {
+    color: #585858;
+  }
+  i {
+    color: #d02d2c;
+  }
+}
+.modal__close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: #585858;
+  text-decoration: none;
+}
+
+</style>
+</head>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<body>
+<link href="https://fonts.googleapis.com/css?family=DM+Sans:400,500,700&display=swap" rel="stylesheet">
+<script>
+    function replaceBattery() {
+        const Http = new XMLHttpRequest();
+        const urlbattery = 'http://localhost:8080/sensors/battery/replace';
+        Http.open("PUT", urlbattery);
+        Http.send();
+        Http.onreadystatechange = (e) => {
+            if (Http.readyState === 4 && Http.status !== 200) {
+                alert("Error during battery replacement confirm");
+            }
+        }
+    }
+
+    function replaceInsulin() {
+        const Http = new XMLHttpRequest();
+        const urlinsulin = 'http://localhost:8080/sensors/tank/refill';
+        Http.open("PUT", urlinsulin);
+        Http.send();
+        Http.onreadystatechange = (e) => {
+            if (Http.readyState === 4 && Http.status !== 200) {
+                alert("Error during insulin tank replacement confirm");
+            }
+        }
+    }
+
+</script>
+<div class="task-manager">
+    <div class="page-content">
+        <div class="header">Last measurements</div>
+        <div class="tasks-wrapper">
+            <div class="task">
+                <div id="timelabel">Time:</div>
+            </div>
+            <div class="task">
+                <div id="pressurelabel">Pressure:</div>
+                <span id="pressurespan" class="tagregular">Regular level</span>
+            </div>
+            <div class="task">
+                <div id="heartlabel">Heart Rate:</div>
+                <span id="heartratespan" class="tagregular">Regular level</span>
+            </div>
+            <div class="task">
+                <div id="bloodlabel">Blood Sugar:</div>
+                <span id="sugarspan" class="tagregular">Regular level</span>
+            </div>
+            <div class="task">
+                <div id="temperaturelabel">Temperature:</div>
+                <span id="temperaturespan" class="tagregular">Regular level</span>
+            </div>
+
+            <div class="header upcoming">Sensor Status and Alarms</div>
+            <div class="task">
+                <div class="p-2" id="batterylabel">Battery level:</div>
+                <span id="batteryspan" class="tagregular">Regular level</span>
+            </div>
+            <div class="task">
+                <div class="p-2" id="refilllabel">Insulin dose available:</div>
+                <span id="insulinspan" class="tagregular">Regular level</span>
+            </div>
+            <div class="buttons-row">
+                <a class="button" href="/charts">Show history</a>
+                <div id="modalbattery" class="modal">
+                    <div class="modal__content">
+                        <h1>Battery Replacement</h1>
+                        <p>
+                            Confirm that you have replaced the battery correctly?
+                        </p>
+                        <div class="modal__footer">
+                            <a class="button" onclick="replaceBattery()" href="#" id="buttonConfirmBattery">Confirm</a>
+                            <a class="button" href="#" id="buttonCancelBattery">Cancel</a>
+                        </div>
+                    </div>
+                </div>
+                <a class="button" href="#modalbattery" id="buttonModalBattery" >Replace Battery</a>
+
+                <div id="modalinsulin" class="modal">
+                    <div class="modal__content">
+                        <h1>Insulin Tank Replacement</h1>
+                        <p>
+                            Confirm that you have replaced the tank correctly?
+                        </p>
+                        <div class="modal__footer">
+                            <a class="button" onclick="replaceInsulin()" href="#" id="buttonConfirmInsulin">Confirm</a>
+                            <a class="button" href="#" id="buttonCancelInsulin">Cancel</a>
+                        </div>
+                    </div>
+                </div>
+                <a href="#modalinsulin" id="buttonModalInsulin" class="button">Recharge Insulin</a>
+            </div>
+        </div>
+    </div>
+    <div class="right-bar">
+        <div class="header">RealTime Charts</div>
+        <div class="right-content">
+            <div class="task-box yellow">
+                <div id="chart1"></div>
+            </div>
+            <div class="task-box blue">
+                <div id="chart2"></div>
+            </div>
+            <div class="task-box red">
+                <div id="chart3"></div>
+            </div>
+            <div class="task-box green">
+                <div id="chart4"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+   function pad(num) {
+      return num < 10 ? '0' + num : num;
+    }
+
+    // Array per memorizzare gli orari del giorno
+    const allDayTimes = [];
+
+    // Genera gli orari del giorno
+    for (let hour = 0; hour < 24; hour++) {
+      for (let min = 0; min < 60; min++) {
+        for (let sec = 0; sec < 60 ; sec++){
+            const hourString = pad(hour);
+            const minString = pad(min);
+            const secString = pad(sec);
+            allDayTimes.push(`${hourString}:${minString}:${secString}`);
+        }
+      }
+    }
+
+    var heartrate_timeseries = [];
+	var sistpressure_timeseries = [];
+	var diastpressure_timeseries = [];
+	var bloodsugar_timeseries = [];
+	var temperature_timeseries = [];
+
+	var options1 = {
+		chart: {
+			type: 'line',
+			animations: {
+				enabled: true,
+				easing: 'linear',
+				dynamicAnimation: {
+					speed: 600
+				}
+			},
+			zoom: {
+				enabled: false
+			},
+			toolbar: {
+				show: false
+			}
+		},
+		series: [{
+			name: 'heartrate',
+			data: heartrate_timeseries
+		}],
+		xaxis: {
+			labels: {
+				show: true,
+			},
+			categories: allDayTimes
+		},
+		yaxis:{
+			title: {
+				text: "bpm"
+			}
+		},
+		title: {
+			text: 'HeartRate Timeseries',
+			align: 'center'
+		},
+		stroke: {
+			curve: 'smooth'
+		}
+	}
+	var options2 = {
+		chart: {
+			type: 'line',
+			animations: {
+				enabled: true,
+				easing: 'linear',
+				dynamicAnimation: {
+					speed: 600
+				}
+			},
+			zoom: {
+				enabled: false
+			},
+			toolbar: {
+				show: false
+			}
+		},
+		series: [{
+				name: 'Sistolic pressure',
+				data: sistpressure_timeseries
+			},
+			{
+				name: 'Diastolic pressure',
+				data: diastpressure_timeseries
+			}
+		],
+		xaxis: {
+			labels: {
+				show: true,
+			},
+			categories: allDayTimes
+		},
+		yaxis:{
+			title: {
+				text: "mmHg"
+			}
+		},
+		title: {
+			text: 'Pressure Timeseries',
+			align: 'center'
+		},
+		stroke: {
+			curve: 'smooth'
+		}
+	}
+	var options3 = {
+		chart: {
+			type: 'line',
+			animations: {
+				enabled: true,
+				easing: 'linear',
+				dynamicAnimation: {
+					speed: 600
+				}
+			},
+			zoom: {
+				enabled: false
+			},
+			toolbar: {
+				show: false
+			}
+		},
+		series: [{
+			name: 'bloodsugar',
+			data: bloodsugar_timeseries
+		}],
+		xaxis: {
+			labels: {
+				show: true,
+			},
+			categories: allDayTimes
+		},
+		yaxis:{
+			title: {
+				text: "mg/dL"
+			}
+		},
+		title: {
+			text: 'Blood Sugar Timeseries',
+			align: 'center'
+		},
+		stroke: {
+			curve: 'smooth'
+		},
+	}
+	var options4 = {
+		chart: {
+			type: 'line',
+			animations: {
+				enabled: true,
+				easing: 'linear',
+				dynamicAnimation: {
+					speed: 600
+				}
+			},
+			zoom: {
+				enabled: false
+			},
+			toolbar: {
+				show: false
+			}
+		},
+		series: [{
+			name: 'temperature',
+			data: temperature_timeseries
+		}],
+		xaxis: {
+			labels: {
+				show: true,
+			},
+			categories: allDayTimes
+		},
+		yaxis:{
+			title: {
+				text: "C°"
+			}
+		},
+		title: {
+			text: 'Temperature Timeseries',
+			align: 'center'
+		},
+		stroke: {
+			curve: 'smooth'
+		},
+	}
+
+	var chart1 = new ApexCharts(document.querySelector("#chart1"), options1);
+	var chart2 = new ApexCharts(document.querySelector("#chart2"), options2);
+	var chart3 = new ApexCharts(document.querySelector("#chart3"), options3);
+	var chart4 = new ApexCharts(document.querySelector("#chart4"), options4);
+
+	chart1.render();
+	chart2.render();
+	chart3.render();
+	chart4.render();
+</script>
+<script>
+
+    function areEquals(obj1, obj2){
+        if(obj1 === null)
+            return false;
+        else{
+            return obj1.timestamp === obj2.timestamp &&
+            obj1.temperature === obj2.temperature &&
+            obj1.heartRate === obj2.heartRate &&
+            obj1.bloodSugarLevel === obj2.bloodSugarLevel &&
+            obj1.bloodPressureSystolic === obj2.bloodPressureSystolic &&
+            obj1.bloodPressureDiastolic === obj2.bloodPressureDiastolic;
+        }
+    }
+
+	const buffer = 15;
+    var criticalsugar = 0;
+    var mediumtemperature = 0;
+    var criticaltemperature = 0;
+    var criticalheart = 0;
+    var criticalpressure = 0;
+
+    var sugar = document.getElementById("sugarspan");
+    var heartrate = document.getElementById("heartratespan");
+    var pressure = document.getElementById("pressurespan");
+    var temperature = document.getElementById("temperaturespan");
+
+    var timelabel = document.getElementById("timelabel");
+    var pressurelabel = document.getElementById("pressurelabel");
+    var heartlabel = document.getElementById("heartlabel");
+    var temperaturelabel = document.getElementById("temperaturelabel");
+    var bloodlabel = document.getElementById("bloodlabel");
+    var lastobj = null;
+
+
+	setInterval(() => {
+		const Http = new XMLHttpRequest();
+		const url = 'http://localhost:8080/vitalparameters/last';
+		Http.open("GET", url);
+		Http.send();
+		Http.onreadystatechange = (e) => {
+			if (Http.readyState === 4 && Http.status === 200) {
+				const obj = JSON.parse(Http.responseText)
+                const trunc_temp = obj.temperature.toFixed(1);
+				var trunc_time = obj.timestamp.slice(11, 19);
+				timelabel.innerHTML = "Time: " + trunc_time;
+				pressurelabel.innerHTML = "Pressure: " + obj.bloodPressureSystolic + "/" + obj.bloodPressureDiastolic + " mmHg";
+				heartlabel.innerHTML = "HeartRate: " + obj.heartRate + " bpm";
+				temperaturelabel.innerHTML = "Temperature: " + trunc_temp + " C°";
+				bloodlabel.innerHTML = "Blood Sugar: " + obj.bloodSugarLevel + " mg/dL";
+
+                console.log();
+                if(!areEquals(lastobj, obj)){
+                    if (heartrate_timeseries.length > buffer) {
+                            heartrate_timeseries.shift();
+                            sistpressure_timeseries.shift();
+                            diastpressure_timeseries.shift();
+                            bloodsugar_timeseries.shift();
+                            temperature_timeseries.shift();
+                    }
+
+                    //Aggiunge i nuovi dati in arrivo ai grafici e alle serie temporali
+                    heartrate_timeseries.push({
+                        x: trunc_time,
+                        y: obj.heartRate
+                    });
+                        sistpressure_timeseries.push({
+                            x: trunc_time,
+                            y: obj.bloodPressureSystolic
+                        });
+                        diastpressure_timeseries.push({
+                            x: trunc_time,
+                            y: obj.bloodPressureDiastolic
+                        });
+                        bloodsugar_timeseries.push({
+                            x: trunc_time,
+                            y: obj.bloodSugarLevel
+                        });
+                        temperature_timeseries.push({
+                            x: trunc_time,
+                            y: trunc_temp
+                        });
+
+                        // Aggiorna il grafico con i nuovi dati
+                        chart1.updateSeries([{
+                            data: heartrate_timeseries
+                        }]);
+                        // Aggiorna il grafico con i nuovi dati
+                        chart2.updateSeries([{
+                            data: sistpressure_timeseries
+                        }, {
+                            data: diastpressure_timeseries
+                        }]);
+                        // Aggiorna il grafico con i nuovi dati
+                        chart3.updateSeries([{
+                            data: bloodsugar_timeseries
+                        }]);
+                        // Aggiorna il grafico con i nuovi dati
+                        chart4.updateSeries([{
+                            data: temperature_timeseries
+                        }]);
+                }
+
+				//dynamic color changes of blood sugar label
+				if(obj.bloodSugarLevel > 130){
+                    sugar.classList.replace("tagregular", "tagcritical");
+                    sugar.innerHTML = "Critical level";
+                    criticalsugar = 1;
+                }
+                else{
+                    if(criticalsugar == 1){
+                        sugar.classList.replace("tagcritical", "tagregular");
+                        sugar.innerHTML = "Regular level";
+                        criticalsugar = 0;
+                    }
+                }
+
+                //dynamic color changes of temperature label
+                if(obj.temperature >= 37.0 && obj.temperature < 38.5){
+                    temperature.classList.replace("tagregular", "tagmedium");
+                    temperature.innerHTML = "Medium level";
+                    mediumtemperature = 1;
+                }
+                else if(obj.temperature > 38.5){
+                    temperature.classList.replace("tagregular", "tagcritical");
+                    temperature.innerHTML = "Critical level";
+                    criticaltemperature = 1;
+                }
+                else{
+                    if(mediumtemperature == 1){
+                        temperature.classList.replace("tagmedium", "tagregular");
+                    }
+                    else{
+                        temperature.classList.replace("tagcritical", "tagregular");
+                    }
+                    temperature.innerHTML = "Regular level";
+                    mediumtemperature = 0;
+                    criticaltemperature = 0;
+                }
+
+                //dynamic color changes of heartRate label
+                if(obj.heartRate >= 150 || obj.heartRate <= 40){
+                    heartrate.classList.replace("tagregular", "tagcritical");
+                    heartrate.innerHTML = "Critical level";
+                    criticalheart = 1;
+                }
+                else{
+                    if(criticalheart == 1){
+                        heartrate.classList.replace("tagcritical", "tagregular");
+                        heartrate.innerHTML = "Regular level";
+                        criticalheart = 0;
+                    }
+                }
+
+                if((obj.bloodPressureSystolic >= 90 && obj.bloodPressureSystolic <= 130) && (obj.bloodPressureDiastolic >= 60 && obj.bloodPressureDiastolic <= 85)){
+                     if(criticalpressure == 1){
+                        pressure.classList.replace("tagcritical", "tagregular");
+                        pressure.innerHTML = "Regular level";
+                        criticalheart = 0;
+                    }
+                }
+                else{
+                    pressure.classList.replace("tagregular", "tagcritical");
+                    pressure.innerHTML = "Critical level";
+                    criticalpressure = 1;
+                }
+
+                lastobj = obj;
+
+			}
+		}
+	}, 1000);
+</script>
+<!-- Sensor status script -->
+<script>
+        var battery = document.getElementById("batteryspan");
+        var insulin = document.getElementById("insulinspan");
+        var mediumbattery = 0;
+        var criticalbattery = 0;
+        var mediuminsulin = 0;
+        var criticalinsulin = 0;
+
+        setInterval(function () {
+            const Http = new XMLHttpRequest();
+            const url='http://localhost:8080/sensors/status';
+            Http.open("GET", url);
+            Http.send();
+
+            Http.onreadystatechange = (e) => {
+                const obj = JSON.parse(Http.responseText)
+                document.getElementById("batterylabel").innerHTML = "Battery level: " + obj.battery + "%";
+                document.getElementById("refilllabel").innerHTML = "Insulin dose available: " + obj.tank;
+
+                //dynamic color changes of battery label
+                if(obj.battery > 10  && obj.battery < 50){
+                    battery.classList.replace("tagregular", "tagmedium");
+                    battery.innerHTML = "Medium level";
+                    mediumbattery = 1;
+                }
+                else {
+                    if(obj.battery <= 10){
+                        battery.classList.replace("tagmedium", "tagcritical");
+                        battery.innerHTML = "Critical level";
+                        criticalbattery = 1;
+                    }
+                    else{
+                        if(mediumbattery == 1){
+                            battery.classList.replace("tagmedium", "tagregular");
+                            mediumbattery = 0;
+                        }
+                        else if(criticalbattery == 1){
+                            battery.classList.replace("tagcritical", "tagregular");
+                             criticalbattery = 0;
+                        }
+                        battery.innerHTML = "Regular level";
+                    }
+                }
+
+                //dynamic color changes of insulin tank label
+                if(obj.tank > 10  && obj.tank < 50){
+                    insulin.classList.replace("tagregular", "tagmedium");
+                    insulin.innerHTML = "Medium level";
+                    mediuminsulin = 1;
+                }
+                else {
+                    if(obj.tank <= 10){
+                        insulin.classList.replace("tagmedium", "tagcritical");
+                        insulin.innerHTML = "Critical level";
+                        criticalinsulin = 1;
+                    }
+                    else{
+                        if(mediuminsulin === 1){
+                            insulin.classList.replace("tagmedium", "tagregular");
+                            mediuminsulin = 0;
+                        }
+                        else if(criticalinsulin === 1){
+                            insulin.classList.replace("tagcritical", "tagregular");
+                            criticalinsulin = 0;
+                        }
+                        insulin.innerHTML = "Regular level";
+                    }
+                }
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
