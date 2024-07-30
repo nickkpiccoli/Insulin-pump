@@ -646,5 +646,6 @@ per l'esecuzione dei test.
 ---
 
 ## <a id="autori"></a> Autori
-- [Alessio Gjergji](https://github.com/alessiogj)
 - [Nicolò Piccoli](https://github.com/nickkpiccoli)
+- [Alessio Gjergji](https://github.com/alessiogj)
+
